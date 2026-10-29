@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07040f">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Sexta-Feira, assistente pessoal de IA">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sexta-Feira">
+<meta name="format-detection" content="telephone=no">
+<title>Sexta-Feira AI</title>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#07040f;--v:#8b5cf6;--v2:#c4b0ff;--text:#f3efff;--muted:#a399c4;--line:rgba(196,176,255,.17);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--neon:linear-gradient(180deg,#a784ff,#7c3aed)}
+[hidden]{display:none!important}
+html{background:var(--bg);-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{margin:0;min-height:100dvh;color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;padding:var(--sat) env(safe-area-inset-right) 0 env(safe-area-inset-left);-webkit-user-select:none;user-select:none}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(70% 38% at 10% 0,rgba(124,58,237,.38),transparent 70%),radial-gradient(55% 35% at 105% 60%,rgba(91,33,182,.34),transparent 70%),radial-gradient(45% 28% at 50% 24%,rgba(255,140,30,.12),transparent 70%)}
+:focus-visible{outline:2px solid var(--v2);outline-offset:2px}
+.glass{background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.025));border:1px solid var(--line);-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(0,0,0,.45),0 20px 40px -20px #000}
+header{display:flex;justify-content:space-between;align-items:center;width:calc(100% - 28px);max-width:652px;margin:10px auto 0;padding:11px 18px;border-radius:999px}
+.logo{font-weight:700;letter-spacing:.3em}
+.status{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.12em;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--v);box-shadow:0 0 10px var(--v);animation:pulse 2.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+main{max-width:680px;margin:auto;padding:8px 14px calc(112px + var(--sab))}
+.hero{text-align:center;padding:4px 0 14px}
+.core{width:240px;height:240px;margin:0 auto -8px}
+#orb{width:240px;height:240px;display:block}
+h1{margin:0;font-size:22px;font-weight:300;letter-spacing:.34em;padding-left:.34em}
+.subtitle{margin-top:8px;font-size:11px;letter-spacing:.16em;color:var(--muted)}
+.panel{border-radius:28px;overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;padding:14px 20px;font-size:10px;letter-spacing:.14em;color:var(--muted);border-bottom:1px solid var(--line)}
+#chat{height:clamp(250px,36dvh,420px);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain;scrollbar-width:none}
+#chat::-webkit-scrollbar{display:none}
+.message{max-width:90%;padding:11px 14px;font-size:14.5px;line-height:1.55;overflow-wrap:anywhere;white-space:pre-wrap;-webkit-user-select:text;user-select:text}
+.bot{align-self:flex-start;background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:6px 20px 20px 20px}
+.user{align-self:flex-end;background:linear-gradient(145deg,rgba(139,92,246,.6),rgba(91,33,182,.42));border:1px solid rgba(196,176,255,.45);border-radius:20px 6px 20px 20px;box-shadow:0 0 20px -6px rgba(139,92,246,.7)}
+.sender{font-size:9px;color:var(--v2);margin-bottom:5px;letter-spacing:.16em}
+.composer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+input,select{min-width:0;width:100%;font:inherit;font-size:16px;color:var(--text);background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:999px;padding:12px 18px;-webkit-user-select:text;user-select:text}
+input::placeholder{color:#7d739e}
+input:focus{outline:none;border-color:var(--v2);box-shadow:0 0 0 3px rgba(139,92,246,.3)}
+button{font:inherit;font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:12px 18px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+button:active{transform:scale(.95)}
+button:disabled{opacity:.45}
+.composer button,.seg button.on,body:has(#core.listening) #voiceBtn{color:#fff;background:var(--neon);border-color:rgba(225,210,255,.6);box-shadow:0 0 22px rgba(139,92,246,.65),inset 0 1px 0 rgba(255,255,255,.4)}
+.tools{position:fixed;left:50%;bottom:calc(12px + var(--sab));transform:translateX(-50%);width:min(652px,calc(100% - 28px));display:flex;gap:6px;padding:7px;border-radius:999px;z-index:10}
+.tools button{flex:1;padding:13px 6px;background:transparent;border-color:transparent}
+body:has(input:focus) .tools{display:none}
+.settings{margin-top:14px;border-radius:28px}
+.settings summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:17px 20px;font-size:12px;letter-spacing:.12em}
+.settings summary::-webkit-details-marker{display:none}
+.settings summary:after{content:"";width:8px;height:8px;border:solid var(--v2);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .25s}
+.settings[open] summary:after{transform:rotate(-135deg)}
+.settings-content{padding:0 18px 18px}
+.setting{margin-top:16px}
+.setting label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:10px 4px;font-size:12px;letter-spacing:0;color:var(--muted)}
+#resetSettings{width:100%;margin-top:20px}
+.settings-note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:14px}
+.note{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.1em;margin:18px 0 0;min-height:16px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+
+<body>
+<header class="glass">
+  <div class="logo">S.F.</div>
+  <div class="status"><i class="dot"></i><span id="systemStatus">SISTEMA ONLINE</span></div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="core" id="core"><canvas id="orb" aria-hidden="true"></canvas></div>
+    <h1>SEXTA-FEIRA</h1>
+    <div class="subtitle">Assistente pessoal · v5.0</div>
+  </section>
+
+  <section class="panel glass">
+    <div class="panel-head">
+      <span>TERMINAL DE CONVERSA</span>
+      <span id="connectionStatus">CONECTANDO</span>
+    </div>
+    <div id="chat" aria-live="polite"></div>
+    <form class="composer" id="form">
+      <input id="message" placeholder="Digite uma mensagem..." autocomplete="off" aria-label="Mensagem">
+      <button id="sendBtn" type="submit">ENVIAR</button>
+    </form>
+  </section>
+
+  <details class="settings glass">
+    <summary>PERSONALIDADE</summary>
+    <div class="settings-content">
+      <div class="setting"><label for="humor">Humor</label>
+        <select id="humor"><option value="baixo">Baixo</option><option value="medio">Médio</option><option value="alto">Alto</option></select></div>
+      <div class="setting"><label for="sarcasmo">Sarcasmo</label>
+        <select id="sarcasmo"><option value="baixo">Baixo</option><option value="medio">Médio</option><option value="alto">Alto</option></select></div>
+      <div class="setting"><label for="proatividade">Proatividade</label>
+        <select id="proatividade"><option value="baixa">Baixa</option><option value="media" selected>Média</option><option value="alta">Alta</option></select></div>
+      <div class="setting"><label for="formalidade">Formalidade</label>
+        <select id="formalidade"><option value="casual">Casual</option><option value="equilibrada" selected>Equilibrada</option><option value="formal">Formal</option></select></div>
+      <div class="setting"><label for="respostas">Tamanho das respostas</label>
+        <select id="respostas"><option value="curtas">Curtas</option><option value="equilibradas" selected>Equilibradas</option><option value="detalhadas">Detalhadas</option></select></div>
+      <button id="resetSettings" type="button">RESTAURAR PADRÕES</button>
+      <div class="settings-note">As escolhas ficam salvas neste aparelho e são enviadas ao servidor a cada mensagem.</div>
+    </div>
+  </details>
+
+  <div class="note" id="statusText">INICIALIZANDO SISTEMAS...</div>
+</main>
+
+<nav class="tools glass">
+  <button id="voiceBtn" type="button">FALAR</button>
+  <button id="soundBtn" type="button">VOZ: ON</button>
+  <button id="clearBtn" type="button">LIMPAR</button>
+</nav>
+
+<script>
+"use strict";
+
+const API_URL = "https://hidden-grass-bc1a.antoniomadson423.workers.dev";
+
+const chat = document.getElementById("chat");
+const form = document.getElementById("form");
+const input = document.getElementById("message");
+const statusText = document.getElementById("statusText");
+const sendBtn = document.getElementById("sendBtn");
+const systemStatus = document.getElementById("systemStatus");
+const connectionStatus = document.getElementById("connectionStatus");
+const voiceBtn = document.getElementById("voiceBtn");
+const soundBtn = document.getElementById("soundBtn");
+const core = document.getElementById("core");
+
+const settingIds = [
+  "humor",
+  "sarcasmo",
+  "proatividade",
+  "formalidade",
+  "respostas"
+];
+
+const defaults = {
+  humor: "baixo",
+  sarcasmo: "baixo",
+  proatividade: "media",
+  formalidade: "equilibrada",
+  respostas: "equilibradas"
+};
+
+let soundEnabled = true;
+let recognition = null;
+let listening = false;
+let busy = false;
+
+function setCoreState(state) {
+  core.classList.remove("listening", "thinking", "speaking");
+  if (state) core.classList.add(state);
+}
+
+function getPersonality() {
+  const personality = {};
+  for (const id of settingIds) {
+    personality[id] = document.getElementById(id).value;
+  }
+  return personality;
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(
+      "sextaFeiraPersonality",
+      JSON.stringify(getPersonality())
+    );
+    statusText.textContent = "PERSONALIDADE SALVA NESTE NAVEGADOR";
+  } catch (error) {
+    statusText.textContent = "CONFIGURAÇÃO ATUALIZADA";
+  }
+}
+
+function loadSettings() {
+  let saved = {};
+
+  try {
+    saved = JSON.parse(
+      localStorage.getItem("sextaFeiraPersonality") || "{}"
+    ) || {};
+  } catch (error) {
+    saved = {};
+  }
+
+  for (const id of settingIds) {
+    const select = document.getElementById(id);
+    const value = saved[id] || defaults[id];
+    const valid = Array.from(select.options).some(
+      option => option.value === value
+    );
+    select.value = valid ? value : defaults[id];
+  }
+}
+
+settingIds.forEach(id => {
+  document.getElementById(id).addEventListener("change", saveSettings);
+});
+
+document.getElementById("resetSettings").addEventListener("click", () => {
+  for (const id of settingIds) {
+    document.getElementById(id).value = defaults[id];
+  }
+  saveSettings();
+});
+
+function addMessage(text, type) {
+  const bubble = document.createElement("div");
+  bubble.className = "message " + type;
+
+  const sender = document.createElement("div");
+  sender.className = "sender";
+  sender.textContent = type === "user" ? "SENHOR" : "SEXTA-FEIRA";
+
+  const content = document.createElement("div");
+  content.textContent = text;
+
+  bubble.append(sender, content);
+  chat.appendChild(bubble);
+  chat.scrollTop = chat.scrollHeight;
+
+  return bubble;
+}
+
+function speak(text) {
+  if (!soundEnabled || !("speechSynthesis" in window)) {
+    setCoreState("");
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "pt-BR";
+  utterance.rate = 1;
+  utterance.pitch = 0.9;
+
+  utterance.onstart = () => {
+    setCoreState("speaking");
+    statusText.textContent = "SEXTA-FEIRA ESTÁ FALANDO";
+  };
+
+  utterance.onend = () => {
+    if (!listening && !busy) {
+      setCoreState("");
+      statusText.textContent = "PRONTA PARA NOVAS INSTRUÇÕES";
+    }
+  };
+
+  utterance.onerror = () => {
+    if (!listening && !busy) setCoreState("");
+  };
+
+  speechSynthesis.speak(utterance);
+}
+
+function respond(text) {
+  addMessage(text, "bot");
+  speak(text);
+}
+
+async function askAI(message) {
+  if (busy) return;
+
+  busy = true;
+  sendBtn.disabled = true;
+  voiceBtn.disabled = true;
+  statusText.textContent = "PROCESSANDO SOLICITAÇÃO...";
+  systemStatus.textContent = "PROCESSANDO";
+  connectionStatus.textContent = "AGUARDE";
+  setCoreState("thinking");
+
+  const loading = addMessage("Analisando sua solicitação...", "bot");
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        personality: getPersonality()
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.reply) {
+      throw new Error(
+        data.details || data.error || "Erro HTTP " + response.status
+      );
+    }
+
+    loading.remove();
+    systemStatus.textContent = "SISTEMA ONLINE";
+    connectionStatus.textContent = "IA CONECTADA";
+    statusText.textContent = "RESPOSTA RECEBIDA";
+
+    respond(data.reply);
+  } catch (error) {
+    loading.remove();
+    addMessage(
+      "Não consegui obter uma resposta. Confira a internet e o servidor.\nDetalhe: " +
+      error.message,
+      "bot"
+    );
+    statusText.textContent = "FALHA NA CONEXÃO";
+    systemStatus.textContent = "ERRO DE CONEXÃO";
+    connectionStatus.textContent = "OFFLINE";
+    setCoreState("");
+  } finally {
+    busy = false;
+    sendBtn.disabled = false;
+    voiceBtn.disabled = false;
+    input.focus();
+  }
+}
+
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  const text = input.value.trim();
+
+  if (!text || busy) return;
+
+  addMessage(text, "user");
+  input.value = "";
+  askAI(text);
+});
+
+soundBtn.addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  soundBtn.textContent = soundEnabled ? "VOZ: ON" : "VOZ: OFF";
+
+  if (!soundEnabled && "speechSynthesis" in window) {
+    speechSynthesis.cancel();
+    if (!busy && !listening) setCoreState("");
+  }
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  chat.replaceChildren();
+  addMessage("Histórico visual limpo. Como posso ajudar?", "bot");
+});
+
+voiceBtn.addEventListener("click", () => {
+  const Recognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!Recognition) {
+    statusText.textContent =
+      "Reconhecimento de voz indisponível neste navegador.";
+    return;
+  }
+
+  if (busy) return;
+
+  if (listening && recognition) {
+    recognition.stop();
+    return;
+  }
+
+  recognition = new Recognition();
+  recognition.lang = "pt-BR";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    listening = true;
+    setCoreState("listening");
+    statusText.textContent = "OUVINDO... FALE AGORA";
+    voiceBtn.textContent = "PARAR";
+  };
+
+  recognition.onresult = event => {
+    const text = event.results[0][0].transcript.trim();
+    if (!text) return;
+    addMessage(text, "user");
+    askAI(text);
+  };
+
+  recognition.onerror = event => {
+    statusText.textContent =
+      event.error === "not-allowed"
+        ? "Acesso ao microfone negado. Verifique as permissões."
+        : "Falha no reconhecimento de voz: " + event.error;
+  };
+
+  recognition.onend = () => {
+    listening = false;
+    voiceBtn.textContent = "FALAR";
+    if (!busy && !speechSynthesis.speaking) setCoreState("");
+  };
+
+  try {
+    recognition.start();
+  } catch (error) {
+    statusText.textContent = "Não foi possível iniciar o microfone.";
+    setCoreState("");
+  }
+});
+
+loadSettings();
+
+addMessage(
+  "Sistemas inicializados, senhor. Personalidade configurável disponível.",
+  "bot"
+);
+
+statusText.textContent = "AGUARDANDO INSTRUÇÕES";
+systemStatus.textContent = "SISTEMA ONLINE";
+connectionStatus.textContent = "PRONTO";
+</script>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+
+  /* Opções de personalidade viram botões de seleção (os <select> continuam como fonte de dados) */
+  const sync = () => document.querySelectorAll(".seg").forEach(s =>
+    [...s.children].forEach(b => b.classList.toggle("on", b.dataset.v === s.previousElementSibling.value)));
+  document.querySelectorAll(".setting select").forEach(sel => {
+    const seg = document.createElement("div");
+    seg.className = "seg";
+    [...sel.options].forEach(o => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = o.textContent; b.dataset.v = o.value;
+      b.onclick = () => { sel.value = o.value; sel.dispatchEvent(new Event("change")); sync(); };
+      seg.append(b);
+    });
+    sel.after(seg); sel.hidden = true;
+  });
+  sync();
+  $("resetSettings").addEventListener("click", sync);
+
+  /* Vibração leve nos toques (sensação de app) */
+  document.addEventListener("click", e => { if (e.target.closest("button") && navigator.vibrate) navigator.vibrate(8); });
+
+  /* Orbe holográfico dourado: reage aos estados do núcleo (ouvindo, pensando, falando) */
+  const cv = $("orb"), x = cv.getContext("2d"), S = 240, D = Math.min(devicePixelRatio || 1, 2), h = S / 2;
+  cv.width = cv.height = S * D; x.scale(D, D);
+  const P = [];
+  for (let i = 0; i < 300; i++) {
+    const y = 1 - 2 * (i + .5) / 300, r = Math.sqrt(1 - y * y), a = i * 2.39996;
+    P.push([Math.cos(a) * r, y, Math.sin(a) * r, .4 + Math.random() * .6]);
+  }
+  let t = 0, sp = .3, rot = 0, R = 80;
+  const pj = (px, py, pz) => {
+    const c = Math.cos(rot), s = Math.sin(rot);
+    const x1 = px * c + pz * s, z1 = -px * s + pz * c;
+    const y2 = py * .94 - z1 * .34, z2 = py * .34 + z1 * .94, f = 1.9 / (1.9 - z2 * .5);
+    return [h + x1 * R * f, h + y2 * R * f, (z2 + 1) / 2];
+  };
+  function draw() {
+    const c = core.classList, sk = c.contains("speaking"), th = c.contains("thinking"), li = c.contains("listening");
+    sp += ((th ? 1.8 : li ? .7 : sk ? .9 : .3) - sp) * .05; t += .016; rot += sp * .016;
+    R = S * .33 * (1 + (sk ? .07 : li ? .05 : .012) * Math.sin(t * (sk ? 10 : 3)));
+    x.clearRect(0, 0, S, S); x.globalCompositeOperation = "lighter";
+    const g = x.createRadialGradient(h, h, R * .1, h, h, R * 1.6);
+    g.addColorStop(0, li ? "rgba(150,110,255,.4)" : "rgba(255,176,60,.34)");
+    g.addColorStop(.6, li ? "rgba(120,70,240,.09)" : "rgba(255,120,20,.09)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+    x.strokeStyle = "rgba(255,170,50,.3)"; x.lineWidth = .8;
+    for (let k = 0; k < 3; k++) {
+      const a = k * 1.05 + rot * (.4 + .3 * k), ca = Math.cos(a), sa = Math.sin(a);
+      x.beginPath();
+      for (let j = 0; j <= 64; j++) {
+        const q = j / 64 * 6.2832, p = pj(Math.cos(q) * 1.07, Math.sin(q) * 1.07 * ca, Math.sin(q) * 1.07 * sa);
+        j ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]);
+      }
+      x.stroke();
+    }
+    for (const q of P) {
+      const p = pj(q[0], q[1], q[2]), d = p[2] * q[3], z = .6 + 1.9 * d;
+      x.fillStyle = `rgba(255,${150 + d * 90 | 0},${40 + d * 70 | 0},${.15 + .8 * d})`;
+      x.fillRect(p[0], p[1], z, z);
+    }
+    const k = x.createRadialGradient(h, h, 0, h, h, R * .3);
+    k.addColorStop(0, "rgba(255,240,200,.55)"); k.addColorStop(1, "rgba(255,170,40,0)");
+    x.fillStyle = k; x.fillRect(0, 0, S, S);
+  }
+  const loop = () => { draw(); requestAnimationFrame(loop); };
+  matchMedia("(prefers-reduced-motion:reduce)").matches ? draw() : loop();
+
+  /* Preparo para virar app: ícone, manifesto e cache offline */
+  try {
+    const ic = document.createElement("canvas"); ic.width = ic.height = 512;
+    const c = ic.getContext("2d");
+    let g = c.createLinearGradient(0, 0, 512, 512);
+    g.addColorStop(0, "#3b1a86"); g.addColorStop(1, "#07040f"); c.fillStyle = g; c.fillRect(0, 0, 512, 512);
+    g = c.createRadialGradient(256, 256, 0, 256, 256, 150);
+    g.addColorStop(0, "#fff4cc"); g.addColorStop(.4, "#ffb830"); g.addColorStop(1, "rgba(255,120,20,0)");
+    c.fillStyle = g; c.beginPath(); c.arc(256, 256, 150, 0, 7); c.fill();
+    c.strokeStyle = "rgba(255,190,70,.85)"; c.lineWidth = 7;
+    for (const r of [.4, -.4]) { c.beginPath(); c.ellipse(256, 256, 170, 60, r, 0, 7); c.stroke(); }
+    const icon = ic.toDataURL("image/png");
+    for (const rel of ["icon", "apple-touch-icon"]) {
+      const l = document.createElement("link"); l.rel = rel; l.href = icon; document.head.append(l);
+    }
+    if (/^https?:/.test(location.protocol)) {
+      const m = {
+        name: "Sexta-Feira AI", short_name: "Sexta-Feira", description: "Assistente pessoal de IA",
+        display: "standalone", orientation: "portrait", lang: "pt-BR",
+        background_color: "#07040f", theme_color: "#07040f",
+        start_url: location.href.split("#")[0],
+        icons: [{ src: icon, sizes: "512x512", type: "image/png", purpose: "any maskable" }]
+      };
+      const l = document.createElement("link"); l.rel = "manifest";
+      l.href = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: "application/manifest+json" }));
+      document.head.append(l);
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
